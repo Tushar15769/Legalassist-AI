@@ -1,6 +1,9 @@
 """
 Role-Based Access Control (RBAC) for LegalAssist AI
 
+get_user_role checks is_admin FIRST, then role attribute, so
+admin elevation is never short-circuited by a non-admin role value.
+
 Role Hierarchy:
     admin > attorney > paralegal > client
 
