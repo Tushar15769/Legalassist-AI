@@ -277,8 +277,13 @@ async def upload_document_file(
             size_bytes=file_bytes_read,
             document_type=document_type,
         )
-        
-        file_ext = file.filename.split(".")[-1].lower() if file.filename else ""
+
+        # Sanitize filename: strip any directory components a client may have
+        # included (e.g. "../../etc/passwd.pdf"), matching the same logic used
+        # in api/routes/cases.py upload_case_document_endpoint.
+        safe_filename = Path(file.filename).name if file.filename else ""
+
+        file_ext = safe_filename.split(".")[-1].lower() if safe_filename else ""
 
         # MIME sniff first bytes to catch renamed binaries (e.g. PDF → .txt)
         try:
@@ -294,7 +299,7 @@ async def upload_document_file(
             "Starting document analysis from upload",
             user_id=current_user.user_id,
             document_id=document_id,
-            filename=file.filename,
+            filename=safe_filename,
             mime_type=mime_type,
         )
 
